@@ -36,6 +36,7 @@ trigger: always_on
 - **Proactiveness**: Verify files exist before editing.
 - **Context**: Read `README.md` or related files if context is missing.
 - **Testing**: Run tests after significant changes if available.
+- **Implementation Plans**: Do NOT update the `implementation_plan.md` for small, incremental requests made AFTER the initial plan has been implemented. Just execute the request or create a small secondary plan if needed.
 
 ## Coding Standards Examples
 
