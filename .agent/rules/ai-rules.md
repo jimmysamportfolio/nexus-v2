@@ -38,6 +38,9 @@ trigger: always_on
 - **Testing**: Run tests after significant changes if available.
 - **Implementation Plans**: Do NOT update the `implementation_plan.md` for small, incremental requests made AFTER the initial plan has been implemented. Just execute the request or create a small secondary plan if needed.
 
+### Module Exports
+- Always update [__init__.py](cci:7://file:///c:/Users/JimEl/OneDrive/Desktop/Projects/nexus-v2/backend/src/agents/__init__.py:0:0-0:0) when adding new modules/classes to export key symbols for cleaner imports.
+
 ## Coding Standards Examples
 
 ### Configuration

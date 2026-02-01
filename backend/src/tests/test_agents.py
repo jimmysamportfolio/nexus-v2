@@ -1,8 +1,7 @@
 import argparse
 import asyncio
 import sys
-from src.agents.base import BaseAgent
-from src.agents.events import AgentEventType
+from agents import BaseAgent, AgentEventType
 
 async def test_agent() -> None:
     parser = argparse.ArgumentParser(description="Nexus v2 Chat CLI")
