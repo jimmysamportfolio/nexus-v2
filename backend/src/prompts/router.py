@@ -98,3 +98,4 @@ Example: To help with updating partnership logs, I need to more information abou
 - Partner name (eg. John Grey)
 - Company name (eg. Google)
 - Sponsorship Amount: (eg. $1,000)
+"""

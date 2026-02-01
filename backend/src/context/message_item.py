@@ -9,6 +9,6 @@ class MessageItem:
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "role": self.role
+            "role": self.role,
             "content": self.content
         }
