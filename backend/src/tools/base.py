@@ -62,7 +62,8 @@ class Tool(ABC):
 
     def to_openai_schema(self) -> dict[str, Any]:
         schema = self.schema
-        #
+
+        # schema is defined by system (not MCP)
         if isinstance(schema, type) and issubclass(schema, BaseModel):
             json_schema = model_json_schema(schema, mode="serialization")
 
@@ -76,6 +77,7 @@ class Tool(ABC):
                 }
             }
         
+        # MCP schema 
         if isinstance(schema, dict):
             result = {
                 "name": self.name,
