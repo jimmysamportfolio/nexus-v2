@@ -23,7 +23,7 @@ class DateTimeParams(BaseModel):
     )
     timestamp: str | None = Field(
         default=None,
-        description="ISO8601 or unix timestamp (for format/add)"
+        description="ISO8601 or unix timestamp (for format/add, defaults to now for add)"
     )
     format_string: str | None = Field(
         default=None,
@@ -170,9 +170,10 @@ class DateTimeTool(Tool):
                     )
 
                 case "add":
-                    if not params.timestamp:
-                        return ToolResult.error_result("timestamp required for add operation")
-                    dt = self._parse_datetime(params.timestamp)
+                    if params.timestamp:
+                        dt = self._parse_datetime(params.timestamp)
+                    else:
+                        dt = datetime.now(tz)  # default to now
                     delta = timedelta(
                         days=params.days, hours=params.hours,
                         minutes=params.minutes, seconds=params.seconds
