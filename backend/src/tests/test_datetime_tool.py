@@ -1,8 +1,13 @@
 import asyncio
 import json
+import sys
 from pathlib import Path
-from src.tools import DateTimeTool
-from src.tools.tool_types import ToolInvocation
+
+# Add src directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from tools import DateTimeTool
+from tools.tool_types import ToolInvocation
 
 
 async def test_datetime_tool():
@@ -78,8 +83,21 @@ async def test_datetime_tool():
     print(f"Success: {result.success}")
     print(f"Output:\n{result.output}")
 
-    # Test 7: Error case
-    print("\n7. Test error handling (missing required param):")
+    # Test 7: Negative diff (end < start)
+    print("\n7. Test 'diff' with negative result (end before start):")
+    result = await tool.execute(ToolInvocation(
+        cwd=Path.cwd(),
+        params={
+            "operation": "diff",
+            "start": "2024-01-20T14:45:30Z",
+            "end": "2024-01-15T10:30:00Z"
+        }
+    ))
+    print(f"Success: {result.success}")
+    print(f"Output:\n{result.output}")
+
+    # Test 8: Error case
+    print("\n8. Test error handling (missing required param):")
     result = await tool.execute(ToolInvocation(
         cwd=Path.cwd(),
         params={"operation": "format"}
