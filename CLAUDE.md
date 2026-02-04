@@ -70,7 +70,7 @@ python src/main.py                     # Run backend (server not yet implemented
 
 ## Key Conventions
 
-- **Configuration**: Always use `config.py` for environment variables. Never use `os.getenv` elsewhere. Key settings: `DEFAULT_TIMEZONE` (default: America/Los_Angeles).
+- **Configuration**: Always use `config.py` for environment variables. Never use `os.getenv` elsewhere. Key settings: `DEFAULT_TIMEZONE` (default: America/Vancouver).
 - **Module Exports**: Update `__init__.py` when adding new modules/classes.
 - **Paths**: Use absolute paths for file operations.
 - **Async-first**: Backend uses async patterns throughout.

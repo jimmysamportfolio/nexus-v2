@@ -15,8 +15,8 @@ class LLMClient:
     def get_client(self) -> AsyncOpenAI:
         if self.client is None:
             self.client = AsyncOpenAI(
-                api_key=config.OPENROUTER_API_KEY,
-                base_url=config.BASE_URL
+                api_key=config.GEMINI_API_KEY,
+                base_url=config.GEMINI_BASE_URL,
             )
         return self.client
 
@@ -54,10 +54,9 @@ class LLMClient:
         client = self.get_client()
 
         kwargs = {
-            "model": config.DEFAULT_AI_MODEL,
+            "model": config.DEFAULT_GEMINI_MODEL,
             "messages": messages,
             "stream": stream,
-            "stream_options": {"include_usage": True}
         }
 
         if tools: 
@@ -107,11 +106,12 @@ class LLMClient:
 
         async for chunk in response:
             if hasattr(chunk, "usage") and chunk.usage:
+                details = chunk.usage.prompt_tokens_details
                 usage = TokenUsage(
                     prompt_tokens=chunk.usage.prompt_tokens,
                     completion_tokens=chunk.usage.completion_tokens,
                     total_tokens=chunk.usage.total_tokens,
-                    cached_tokens=chunk.usage.prompt_tokens_details.cached_tokens,
+                    cached_tokens=details.cached_tokens if details else 0,
                 )
 
             if not chunk.choices:
@@ -155,13 +155,23 @@ class LLMClient:
         content = message.content
         finish_reason = choice.finish_reason
         
+        tool_calls: list[ToolCall] = []
+        if message.tool_calls:
+            for tool_call in message.tool_calls:
+                tool_calls.append(ToolCall(
+                    call_id=tool_call.id,
+                    name=tool_call.function.name,
+                    arguments=parse_tool_call_arguments(tool_call.function.arguments)
+                ))
+
         usage = None
         if response.usage:
+            details = response.usage.prompt_tokens_details
             usage = TokenUsage(
                 prompt_tokens=response.usage.prompt_tokens,
                 completion_tokens=response.usage.completion_tokens,
                 total_tokens=response.usage.total_tokens,
-                cached_tokens=response.usage.prompt_tokens_details.cached_tokens,
+                cached_tokens=details.cached_tokens if details else 0,
             )
 
         return StreamEvent.create_msg_complete(finish_reason, usage, content)

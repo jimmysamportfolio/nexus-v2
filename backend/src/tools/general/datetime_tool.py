@@ -3,6 +3,7 @@ import json
 from datetime import datetime, timedelta, timezone
 from typing import Literal
 
+import tzdata 
 from pydantic import BaseModel, Field
 from zoneinfo import ZoneInfo
 
@@ -16,18 +17,52 @@ class DateTimeParams(BaseModel):
     operation: Literal["now", "format", "parse", "diff", "add"] = Field(
         description="Operation to perform"
     )
-    timezone: str | None = Field(default=None, description="IANA timezone (e.g. America/New_York)")
-    timestamp: str | None = Field(default=None, description="ISO8601 or unix timestamp (for format/add)")
-    format_string: str | None = Field(default=None, description="strftime format string")
-    datetime_string: str | None = Field(default=None, description="String to parse (for parse)")
-    input_format: str | None = Field(default=None, description="strptime format for parsing")
-    start: str | None = Field(default=None, description="Start timestamp (for diff)")
-    end: str | None = Field(default=None, description="End timestamp (for diff)")
-    days: int = Field(default=0, description="Days to add")
-    hours: int = Field(default=0, description="Hours to add")
-    minutes: int = Field(default=0, description="Minutes to add")
-    seconds: int = Field(default=0, description="Seconds to add")
+    timezone: str | None = Field(
+        default=None,
+        description="IANA timezone (e.g. America/New_York)"
+    )
+    timestamp: str | None = Field(
+        default=None,
+        description="ISO8601 or unix timestamp (for format/add)"
+    )
+    format_string: str | None = Field(
+        default=None,
+        description="strftime format string"
+    )
+    datetime_string: str | None = Field(
+        default=None,
+        description="String to parse (for parse)"
+    )
+    input_format: str | None = Field(
+        default=None,
+        description="strptime format for parsing"
+    )
 
+    # diff calculation fields
+    start: str | None = Field(
+        default=None,
+        description="Start timestamp (for diff)"
+    )
+    end: str | None = Field(
+        default=None,
+        description="End timestamp (for diff)"
+    )
+    days: int = Field(
+        default=0,
+        description="Days to add"
+    )
+    hours: int = Field(
+        default=0,
+        description="Hours to add"
+    )
+    minutes: int = Field(
+        default=0,
+        description="Minutes to add"
+    )
+    seconds: int = Field(
+        default=0,
+        description="Seconds to add"
+    )
 
 class DateTimeTool(Tool):
     name: str = "datetime"
