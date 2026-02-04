@@ -1,8 +1,9 @@
 from __future__ import annotations
-from llm import TokenUsage
-from typing import Any
-from enum import Enum
 from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any
+
+from llm import TokenUsage
 
 class AgentEventType(str, Enum):
     # Agent lifecyle

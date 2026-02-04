@@ -1,7 +1,12 @@
 import argparse
 import asyncio
 import sys
-from agents import BaseAgent, AgentEventType
+from pathlib import Path
+
+# Add src directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from agents import AgentEventType, BaseAgent
 
 async def test_agent() -> None:
     parser = argparse.ArgumentParser(description="Nexus v2 Chat CLI")
@@ -13,6 +18,7 @@ async def test_agent() -> None:
     async with BaseAgent() as agent:
         try:
             async for event in agent.run(input_prompt):
+                print(event)
                 if event.type == AgentEventType.TEXT_DELTA:
                     content = event.data.get("content", "")
                     print(content, end="", flush=True)

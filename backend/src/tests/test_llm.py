@@ -1,9 +1,13 @@
 import argparse
 import asyncio
 import sys
-from src.config import config
-from src.llm.llm_client import LLMClient
-from src.llm.response import StreamEventType
+from pathlib import Path
+
+# Add src directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from config import config
+from llm import LLMClient, StreamEventType
 
 async def test_llm_client():
     parser = argparse.ArgumentParser(description="Nexus v2 Chat CLI")

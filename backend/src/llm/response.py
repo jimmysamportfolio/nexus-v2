@@ -1,6 +1,7 @@
 from __future__ import annotations
+import json
 from dataclasses import dataclass
-from enum import Enum
+from typing import Any
 
 @dataclass
 class TextDelta:
@@ -14,6 +15,10 @@ class StreamEventType:
     TEXT_DELTA = "text_delta"
     MESSAGE_COMPLETE = "message_complete"
     ERROR = "error"
+
+    TOOL_CALL_START = "tool_call_start"
+    TOOL_CALL_DELTA = "tool_call_delta"
+    TOOL_CALL_COMPLETE = "tool_call_complete"
 
 @dataclass
 class TokenUsage:
@@ -31,12 +36,26 @@ class TokenUsage:
         )
 
 @dataclass
+class ToolCallDelta:
+    call_id: str
+    name: str | None = None
+    arguments_delta: str = ""
+
+@dataclass
+class ToolCall:
+    call_id: str
+    name: str | None = None
+    arguments: str = ""
+
+@dataclass
 class StreamEvent:
     type: StreamEventType
     text_delta: TextDelta | None = None
     error: str | None = None
     finish_reason: str | None = None
     usage: TokenUsage | None = None
+    tool_call_delta: ToolCallDelta | None = None
+    tool_call: ToolCall | None = None
 
     @classmethod
     def create_error(cls, error: str) -> StreamEvent:
@@ -66,4 +85,52 @@ class StreamEvent:
             usage=usage,
             text_delta=delta
         )
+
+    @classmethod
+    def create_tool_call_start(
+        cls,
+        call_id: str,
+        name: str
+    ) -> StreamEvent:
+        return cls(
+            type=StreamEventType.TOOL_CALL_START,
+            tool_call_delta=ToolCallDelta(
+                call_id=call_id,
+                name=name
+            )
+        )
+    
+    @classmethod
+    def create_tool_call_delta(
+        cls,
+        call_id: str,
+        arguments: str
+    ) -> StreamEvent:
+        return cls(
+            type=StreamEventType.TOOL_CALL_DELTA,
+            tool_call_delta=ToolCallDelta(
+                call_id=call_id,
+                arguments_delta=arguments
+            )
+        )
+
+    @classmethod
+    def create_tool_call_complete(
+        cls,
+        tool_call: ToolCall
+    ) -> StreamEvent:
+        return cls(
+            type=StreamEventType.TOOL_CALL_COMPLETE,
+            tool_call=tool_call
+        )
+
+
+def parse_tool_call_arguments(arguments_str: str) -> dict[str, Any]:
+    if not arguments_str:
+        return {}
+    
+    try:
+        return json.loads(arguments_str)
+    except json.JSONDecodeError:
+        return {"raw_arguments": arguments_str}
 

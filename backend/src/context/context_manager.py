@@ -1,9 +1,11 @@
 from __future__ import annotations
-from prompts import get_system_prompt
-from .message_item import MessageItem
-from config import config
 from typing import Any, List
+
+from config import config
+from prompts import get_system_prompt
 from utils import count_tokens
+
+from .message_item import MessageItem
 
 class ContextManager:
     def __init__(self) -> None:
