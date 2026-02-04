@@ -48,5 +48,4 @@ class ToolConfirmation:
 
 @dataclass
 class ToolInvocation:
-    cwd: Path
     params: dict[str, Any]

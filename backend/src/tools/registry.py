@@ -44,7 +44,6 @@ class ToolRegistry:
         self,
         name: str,
         params: dict[str, Any],
-        cwd: Path | None
     ):
         tool = self.get(name)
         if tool is None:
@@ -65,7 +64,6 @@ class ToolRegistry:
 
         invocation = ToolInvocation(
             params=params,
-            cwd=cwd,
         )
         try: 
             return await tool.execute(invocation)
