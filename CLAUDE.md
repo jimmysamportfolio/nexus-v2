@@ -38,23 +38,26 @@ python src/main.py                     # Run backend (server not yet implemented
 **LLM Client** (`src/llm/`): OpenRouter API integration
 - Async streaming with retry logic and exponential backoff
 - `StreamEvent` and `TokenUsage` response schemas
+- Tool call streaming: `ToolCall`, `ToolCallDelta`, event types for START/DELTA/COMPLETE
 
 **Context Management** (`src/context/`): Message history handling
 - `ContextManager`: Manages conversation history and system prompts
 - `MessageItem`: Individual messages with token counting via tiktoken
 
 **Tools** (`src/tools/`): Tool abstraction layer
-- `BaseTool`: Abstract base class for all tools
+- `Tool`: Abstract base class for all tools
+- `ToolRegistry`: Manages tool registration, schema generation, and invocation
 - `ToolKind`: READ, WRITE, NETWORK, MEMORY, MCP
-- Validation and OpenAI-compatible schema generation
+- `ToolInvocation`, `ToolResult`, `ToolConfirmation`: Execution types
+- Pydantic validation and OpenAI-compatible schema generation
 
 **Prompts** (`src/prompts/`): System prompt generation with subagent definitions
 
 ### Data Flow
 1. User input → `BaseAgent.run()`
 2. Message added to `ContextManager`
-3. `LLMClient` streams response via OpenRouter API
-4. Events yielded to caller (TEXT_DELTA, TEXT_COMPLETE, ERROR)
+3. `LLMClient` streams response via OpenRouter API (with tool schemas)
+4. Events yielded to caller (TEXT_DELTA, TEXT_COMPLETE, TOOL_CALL_*, ERROR)
 
 ### Frontend
 - Next.js App Router with React 19 and TypeScript

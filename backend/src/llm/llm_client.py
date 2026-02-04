@@ -1,7 +1,7 @@
 import asyncio
 
 from openai import RateLimitError, APIConnectionError, APIError
-from .response import TokenUsage, StreamEvent
+from .response import TokenUsage, StreamEvent, ToolCall, parse_tool_call_arguments
 from typing import AsyncGenerator
 from typing import Any
 from openai import AsyncOpenAI
@@ -25,14 +25,44 @@ class LLMClient:
             await self.client.close()
             self.client = None
 
-    async def chat_completion(self, messages: list[dict[str, Any]], stream: bool) -> AsyncGenerator[StreamEvent, None]:
+    # proper formatting for openai client
+    def _build_tools(self, tools: list[dict[str, Any]]):
+        return [
+            {
+                'type': 'function',
+                'function': {
+                    'name': tool['name'],
+                    'description': tool.get('description', ""),
+                    'parameters': tool.get(
+                        'parameters',
+                        {
+                            'type': 'object',
+                            'properties': {}
+                        }
+                    )
+                }
+            }
+            for tool in tools
+        ]
+
+    async def chat_completion(
+        self,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]] | None = None,
+        stream: bool=True,
+    ) -> AsyncGenerator[StreamEvent, None]:
         client = self.get_client()
 
         kwargs = {
             "model": config.DEFAULT_AI_MODEL,
             "messages": messages,
-            "stream": stream
+            "stream": stream,
+            "stream_options": {"include_usage": True}
         }
+
+        if tools: 
+            kwargs['tools'] = self._build_tools(tools)
+            kwargs['tool_choice'] = 'auto'
 
         for attempt in range(self._max_retries + 1):
             try:
@@ -73,6 +103,7 @@ class LLMClient:
 
         usage: TokenUsage | None = None
         finish_reason : str | None = None
+        tool_calls: dict[int, dict[str, Any]] = {}
 
         async for chunk in response:
             if hasattr(chunk, "usage") and chunk.usage:
@@ -95,6 +126,20 @@ class LLMClient:
 
             if content:
                 yield StreamEvent.create_delta(content)
+
+            if delta.tool_calls:
+                for tool_call_delta in delta.tool_calls:
+                    async for event in self._handle_tool_call_delta(tool_calls, tool_call_delta):
+                        yield event
+
+        for index, tool_call in tool_calls.items():
+            yield StreamEvent.create_tool_call_complete(
+                tool_call=ToolCall(
+                    call_id=tool_call['id'],
+                    name=tool_call['name'],
+                    arguments=parse_tool_call_arguments(tool_call['arguments'])
+                )
+            )
 
         yield StreamEvent.create_msg_complete(finish_reason, usage)
         
@@ -120,5 +165,35 @@ class LLMClient:
             )
 
         return StreamEvent.create_msg_complete(finish_reason, usage, content)
+      
+        # helper for processing streamed tool calls 
+    async def _handle_tool_call_delta(
+        self,
+        tool_calls: dict[int, dict[str, Any]],
+        tool_call_delta: Any
+    ) -> AsyncGenerator[StreamEvent, None]:
+        idx = tool_call_delta.index
+        
+        if idx not in tool_calls:
+            tool_calls[idx] = {
+                'id': tool_call_delta.id or "",
+                'name': '',
+                'arguments': ''
+            }
+
+        if tool_call_delta.function:
+            if tool_call_delta.function.name:
+                tool_calls[idx]['name'] = tool_call_delta.function.name
+                yield StreamEvent.create_tool_call_start(
+                    call_id=tool_calls[idx]['id'],
+                    name=tool_call_delta.function.name,
+                )
+
+            if tool_call_delta.function.arguments:
+                tool_calls[idx]['arguments'] += tool_call_delta.function.arguments
+                yield StreamEvent.create_tool_call_delta(
+                    call_id=tool_calls[idx]['id'],
+                    arguments=tool_call_delta.function.arguments,
+                )
       
         

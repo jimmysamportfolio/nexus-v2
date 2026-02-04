@@ -13,6 +13,7 @@ async def test_agent() -> None:
     async with BaseAgent() as agent:
         try:
             async for event in agent.run(input_prompt):
+                print(event)
                 if event.type == AgentEventType.TEXT_DELTA:
                     content = event.data.get("content", "")
                     print(content, end="", flush=True)

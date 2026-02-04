@@ -1,4 +1,5 @@
 from __future__ import annotations
+from tools.registry import create_default_registry
 from .events import AgentEventType, AgentEvent
 from llm import LLMClient, StreamEventType
 from typing import AsyncGenerator
@@ -8,6 +9,7 @@ class BaseAgent:
     def __init__(self):
         self.client = LLMClient()
         self._context_manager = ContextManager()
+        self._tool_registry = create_default_registry()
 
     async def run(self, message: str):
         yield AgentEvent.agent_start(message)
@@ -26,8 +28,14 @@ class BaseAgent:
 
     async def _agentic_loop(self) -> AsyncGenerator[AgentEvent, None]:
         response_text = ""
+
+        tool_schemas = self._tool_registry.get_schemas()
         
-        async for event in self.client.chat_completion(self._context_manager.get_messages(), True):
+        async for event in self.client.chat_completion(
+            self._context_manager.get_messages(),
+            tools=tool_schemas if tool_schemas else None,
+            stream=True
+        ):
             if event.type == StreamEventType.TEXT_DELTA:
                 if event.text_delta:
                     content = event.text_delta.content

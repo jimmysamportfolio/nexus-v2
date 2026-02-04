@@ -1,6 +1,6 @@
+from __future__ import annotations
 from pydantic.json_schema import model_json_schema
 from pathlib import Path
-from __future__ import annotations
 from typing import Any
 from abc import ABC, abstractmethod
 from pydantic import BaseModel, ValidationError
@@ -73,7 +73,7 @@ class Tool(ABC):
                 "parameters": {
                     "type": 'object',
                     "properties": json_schema.get("properties", {}),
-                    "required": json_schema.get("requried", [])
+                    "required": json_schema.get("required", [])
                 }
             }
         
@@ -84,7 +84,7 @@ class Tool(ABC):
                 "description": self.description
             }
 
-            if "paramters" in schema:
+            if "parameters" in schema:
                 result["parameters"] = schema["parameters"]
             else:
                 result["parameters"] = schema
