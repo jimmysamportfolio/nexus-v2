@@ -3,6 +3,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
+from pydantic.type_adapter import P
+
+from tools import ToolResult
 from llm import TokenUsage
 
 class AgentEventType(str, Enum):
@@ -14,6 +17,10 @@ class AgentEventType(str, Enum):
     # Text streaming
     TEXT_DELTA = "text_delta"
     TEXT_COMPLETE = "text_complete"
+
+    # Tool calls
+    TOOL_CALL_START = "tool_call_start"
+    TOOL_CALL_COMPLETE = "tool_call_complete"
 
 @dataclass
 class AgentEvent:
@@ -67,4 +74,39 @@ class AgentEvent:
             }
         )
 
+    @classmethod
+    def tool_call_start(
+        cls,
+        call_id: str,
+        name: str,
+        arguments: dict[str, Any],
+    ):
+        return cls(
+            type=AgentEventType.TOOL_CALL_START,
+            data={
+                "call_id": call_id,
+                "name": name,
+                "arguments": arguments,
+            }
+        )
+
+    @classmethod
+    def tool_call_complete(
+        cls, 
+        call_id: str,
+        name: str,
+        result: ToolResult
+    ):
+        return cls(
+            type=AgentEventType.TOOL_CALL_COMPLETE,
+            data={
+                "call_id": call_id,
+                "name": name,
+                "success": result.success,
+                "output": result.output,
+                "error": result.error,
+                "metadata": result.metadata,
+                "truncated": result.truncated,
+            }
+        )
     

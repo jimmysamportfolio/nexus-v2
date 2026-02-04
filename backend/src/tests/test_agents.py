@@ -22,7 +22,6 @@ async def test_agent() -> None:
                 if event.type == AgentEventType.TEXT_DELTA:
                     content = event.data.get("content", "")
                     print(content, end="", flush=True)
-
                 elif event.type == AgentEventType.TEXT_COMPLETE:
                     print()
                     final_response = event.data.get("content")

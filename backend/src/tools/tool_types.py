@@ -17,6 +17,7 @@ class ToolResult:
     output: str
     error: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
+    truncated: bool = False
 
     @classmethod
     def success_result(
@@ -39,6 +40,12 @@ class ToolResult:
             error=error,
             metadata=metadata or {}
         )
+    
+    def to_model_output(self) -> str:
+        if self.success:
+            return self.output
+
+        return f"Error: {self.error}\n\nOutput: {self.output}"
 
 @dataclass
 class ToolConfirmation:
