@@ -7,8 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from config import config
-from llm.llm_client import LLMClient
-from llm.response import StreamEventType
+from llm import LLMClient, StreamEventType
 
 async def test_llm_client():
     parser = argparse.ArgumentParser(description="Nexus v2 Chat CLI")

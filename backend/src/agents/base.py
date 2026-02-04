@@ -1,9 +1,11 @@
 from __future__ import annotations
-from tools.registry import create_default_registry
-from .events import AgentEventType, AgentEvent
-from llm import LLMClient, StreamEventType
 from typing import AsyncGenerator
+
 from context import ContextManager
+from llm import LLMClient, StreamEventType
+from tools import create_default_registry
+
+from .events import AgentEvent, AgentEventType
 
 class BaseAgent:
     def __init__(self):

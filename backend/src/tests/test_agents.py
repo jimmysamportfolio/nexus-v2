@@ -6,7 +6,7 @@ from pathlib import Path
 # Add src directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from agents import BaseAgent, AgentEventType
+from agents import AgentEventType, BaseAgent
 
 async def test_agent() -> None:
     parser = argparse.ArgumentParser(description="Nexus v2 Chat CLI")

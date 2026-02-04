@@ -6,8 +6,7 @@ from pathlib import Path
 # Add src directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from tools import DateTimeTool
-from tools.tool_types import ToolInvocation
+from tools import DateTimeTool, ToolInvocation
 
 
 async def test_datetime_tool():
