@@ -47,9 +47,13 @@ python src/main.py                     # Run backend (server not yet implemented
 **Tools** (`src/tools/`): Tool abstraction layer
 - `Tool`: Abstract base class for all tools
 - `ToolRegistry`: Manages tool registration, schema generation, and invocation
+- `create_default_registry()`: Factory that returns registry with all builtin tools
 - `ToolKind`: READ, WRITE, NETWORK, MEMORY, MCP
 - `ToolInvocation`, `ToolResult`, `ToolConfirmation`: Execution types
+- `ToolResult.success_result()`, `ToolResult.error_result()`: Factory methods
 - Pydantic validation and OpenAI-compatible schema generation
+- `general/`: Builtin general-purpose tools
+  - `DateTimeTool`: now, format, parse, diff, add operations (default tz: PST)
 
 **Prompts** (`src/prompts/`): System prompt generation with subagent definitions
 
@@ -66,7 +70,7 @@ python src/main.py                     # Run backend (server not yet implemented
 
 ## Key Conventions
 
-- **Configuration**: Always use `config.py` for environment variables. Never use `os.getenv` elsewhere.
+- **Configuration**: Always use `config.py` for environment variables. Never use `os.getenv` elsewhere. Key settings: `DEFAULT_TIMEZONE` (default: America/Los_Angeles).
 - **Module Exports**: Update `__init__.py` when adding new modules/classes.
 - **Paths**: Use absolute paths for file operations.
 - **Async-first**: Backend uses async patterns throughout.

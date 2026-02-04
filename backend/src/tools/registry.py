@@ -79,8 +79,10 @@ class ToolRegistry:
 
 
 def create_default_registry() -> ToolRegistry:
+    from .general import DateTimeTool
+
     registry = ToolRegistry()
-    BUILTIN_TOOLS = [] # TODO add default tools here 
+    BUILTIN_TOOLS = [DateTimeTool]
 
     for tool_class in BUILTIN_TOOLS:
         registry.register(tool_class())

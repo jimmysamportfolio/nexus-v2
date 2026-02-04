@@ -27,17 +27,16 @@ class Tool(ABC):
 
         # check if schema is of type BaseModel (not MCP in this context)
         if isinstance(schema, type) and issubclass(schema, BaseModel):
-            try: 
-                BaseModel(**params)
+            try:
+                schema(**params)
             except ValidationError as e:
                 errors = []
                 for error in e.errors():
                     field = ".".join(str(x) for x in error.get("loc", []))
                     msg = error.get("msg", "Validation error")
                     errors.append(f"Parameter '{field}': {msg}")
-                
                 return errors
-            
+
             except Exception as e:
                 return [str(e)]
 

@@ -11,6 +11,9 @@ class Config:
     MAX_RETRIES = 3
     DEFAULT_PROMPT = "Hello, tell me a short joke."
 
+    # tools
+    DEFAULT_TIMEZONE: str = os.getenv("DEFAULT_TIMEZONE", "America/Los_Angeles")
+
 
     
 config = Config()
